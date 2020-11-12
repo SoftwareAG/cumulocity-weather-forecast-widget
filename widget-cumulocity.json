@@ -1,0 +1,13 @@
+{
+  "name": "Weather forecast",
+  "contextPath": "weather-forecast-widget",
+  "key": "weather-forecast-widget-application-key",
+  "contentSecurityPolicy": "default-src 'self'",
+  "description": "Provides a 5-day weather forecast using OpenWeatherAPI",
+  "icon": {
+    "class": "fa fw fa-sun-o"
+  },
+  "manifest": {
+    "noAppSwitcher": true
+  }
+}
