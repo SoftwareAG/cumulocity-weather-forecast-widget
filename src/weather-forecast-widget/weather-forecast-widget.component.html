@@ -1,0 +1,42 @@
+<ng-container *ngIf="weather_forecast">
+    <div class="weather-forecast-container">
+        <div class="weather-group" *ngFor="let weather of weather_forecast">
+            <table>
+                <tr>
+                    <td class="weather-image-container" colspan="2">
+                        <img src="http://openweathermap.org/img/wn/{{weather.icon}}@2x.png"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="weather-date-container" colspan="2">
+                        <b>{{weather.date| date:'EEE dd-MMM'}}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="weather-attribute-title">
+                        <b>Outlook:</b>
+                    </td>
+                    <td>{{weather.desc}} </td>
+                </tr>
+                <tr>
+                    <td class="weather-attribute-title">
+                        <b>Temperature:</b>
+                    </td>
+                    <td>{{weather.temp | number:"1.0-0"}}C</td>
+                </tr>
+                <tr>
+                    <td class="weather-attribute-title">
+                        <b>Humidity:</b>
+                    </td>
+                    <td>{{weather.humidity}}%</td>
+                </tr>
+                <tr>
+                    <td class="weather-attribute-title">
+                        <b>Wind:</b>
+                    </td>
+                    <td>{{weather.wind.speed | number:"1.0-0"}}mph</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</ng-container>

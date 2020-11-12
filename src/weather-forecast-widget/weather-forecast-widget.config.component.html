@@ -1,0 +1,35 @@
+<ng-form #configForm="ngForm">
+
+    <c8y-form-group>
+        <label for="weatherAPIConfig">
+            OpenWeatherAPI Configuration
+        </label>
+    </c8y-form-group>
+
+    <c8y-form-group>
+        <label for="openWeather-apikey">
+            API Key
+        </label>
+        <input type="text" name="weatherAPIConfig-apikey" id="openWeather-apikey"
+            class="form-control bar-chart-control" (change)="onConfigChanged($event)"
+            [(ngModel)]="weatherAPIConfig.apikey" placeholder='API Key' />
+    </c8y-form-group>
+
+    <c8y-form-group>
+        <label for="openWeather-period">
+            Refresh (in hours)
+        </label>
+        <input type="text" name="weatherAPIConfig-period" id="openWeather-period"
+            class="form-control bar-chart-control" (change)="onConfigChanged($event)"
+            [(ngModel)]="weatherAPIConfig.period" placeholder='Update Period (hours)' />
+    </c8y-form-group>
+
+    <c8y-form-group>
+        <label for="openWeather-city">
+            City
+        </label>
+        <input type="text" name="weatherAPIConfig-city" id="openWeather-city"
+                class="form-control bar-chart-control" (change)="onConfigChanged($event)"
+                [(ngModel)]="weatherAPIConfig.city" placeholder='City (blank=<device location>)' />
+    </c8y-form-group>
+</ng-form>
