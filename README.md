@@ -13,36 +13,30 @@
 
 ### Runtime Widget Deployment?
 
-* This widget supports runtime deployment. Download the [Runtime Binary](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.0/weather-forecast-widget.zip).
+* This widget supports runtime deployment. Download the [Runtime Binary](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.0/weather-forecast-widget.zip) and follow runtime deployment instructions from [here](https://github.com/SoftwareAG/cumulocity-runtime-widget-loader).
 
-# Deploying the widget
-To deploy the widget to your Cumulocity tenant
+## Quickstart
+This guide will teach you how to add the widget in your existing or new dashboard.
 
-1. Download the latest version of this widget
-2. Log into your Cumulocity tenant
-3. If you do not have application builder installed, please follow the steps shown [here](https://github.com/SoftwareAG/cumulocity-app-builder)
-4. If you have not yet created your application using the application Builder, please click on 'Application builder' and then click on 'Add application'
-6. In your application, click on the 'More...' link on the right side of the screen
-7. Click on 'Install widget' and follow the instructions
+NOTE: This guide assumes that you have followed the [installation](https://github.com/SoftwareAG/cumulocity-runtime-widget-loader) instructions
 
-# Deployment - as part of the Cumulocity IoT Cockpit application
-1. Clone the repository on your local machine using `git clone https://github.com/SoftwareAG/cumulocity-weather-forecast-widget.git`.
-2. Run `npm install` to install the module dependencies.
-3. Run `c8ycli build` to build the cockpit application.
-4. Run `c8ycli deploy` and follow the instructions to deploy the cockpit application on your tenant. This will include the widget also.
-
-## Adding the widget to your dashboard
-1. To add the widget to your dashboard, click on your application and select the 'Add Widget' link at the top of the screen
-2. Scroll down and select the 'Weather Forecast' widget
-3. See the next section for widget configuration details
-
-## Configuring the Widget through your Cumulocity tenant
 1. Register a new account with [OpenWeather](https://openweathermap.org/)
-2. Verify your account by clicking on the email which has been sent to you
-3. In the 'Weather Forecast' widget:
-    3a. Enter your API key
-    3b. Enter the refresh rate
-    3c. Enter the weather forecast location
+2. Verify your openweathermap account by clicking on the email which has been sent to you
+3. Log into your openweathermap account and add a new API under `API keys`
+3. Open the Application Builder application from the app switcher (Next to your username in the top right)
+4. Add a new dashboard or navigate to an existing dashboard
+5. Click `Add Widget`
+6. Search for `Weather Forecast`
+7. See below for the configuration options
+
+### Configuration options
+
+1. Select your device in the `Target Assets or Devices` field
+2. Enter the `API Key` which was generated in your openweathermap `API keys` page
+3. Enter the `Refresh (in hours)` e.g. 1 
+4. Enter the `City`. This is an optional field. The latitude and longitude of your selected device will be used if it has been configured.
+
+   **Note** the City will default to London, if no city name is typed into this field and the selected device doesn't contain location (latitude & longitude) details. 
 
 ### Development - to enhance and test this widget in your local environment
 1. Clone the repository on your local machine using `git clone https://github.com/SoftwareAG/cumulocity-weather-forecast-widget.git`.
