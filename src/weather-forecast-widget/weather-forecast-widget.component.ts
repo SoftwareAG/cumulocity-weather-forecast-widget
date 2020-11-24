@@ -72,7 +72,8 @@ export class WeatherForecastWidget implements OnInit, OnDestroy {
 
     private async updateForecast() {
         try {
-            const getForecastResponse = await this.getForecast().toPromise();
+            const getForecastResponse = await this.getForecast();
+            console.log(getForecastResponse);
             if (getForecastResponse == undefined || !_.has(getForecastResponse, `list`)) {
                 return;
             }
@@ -97,17 +98,23 @@ export class WeatherForecastWidget implements OnInit, OnDestroy {
                     };
             });
         } catch(error) {
-            console.error(error.error.message);
+            console.error(error);
         }
     }
 
     private getForecast() {
         if ( _.has(this.config, 'city') ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.config.city}&units=metric&appid=${this.config.apikey}`)
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.config.city}&units=metric&appid=${this.config.apikey}`).toPromise()
+                .catch(error => {
+                    throw new Error(`Error retrieving weather forecast by city '${this.config.city}' : ${JSON.stringify(error)}`);
+            })
         } else if( this.config.latitude && this.config.longitude ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.config.latitude}&lon=${this.config.longitude}&units=metric&appid=${this.config.apikey}`)
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.config.latitude}&lon=${this.config.longitude}&units=metric&appid=${this.config.apikey}`).toPromise()
+                .catch(error => {
+                    throw new Error(`Error retrieving weather forecast by latitude '${this.config.latitude}' and longitude '${this.config.longitude}' : ${JSON.stringify(error)}`);
+            });
         } else {
-            console.log("Weather Widget configuration was not set correctly.")
+            throw new Error(`Weather Forecast widget location (city or latitude and longitude) has not been set correctly.`);
         }
     }
 
