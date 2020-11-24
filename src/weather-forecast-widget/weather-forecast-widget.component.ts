@@ -15,37 +15,54 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
  */
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, DoCheck, ElementRef, Input, OnDestroy, OnInit} from '@angular/core';
 import { Realtime, InventoryService } from '@c8y/client';
 import * as _ from 'lodash';
 import { HttpClient } from "@angular/common/http";
 import { IWidgetConfig } from "./i-widget-config";
 import { IWeatherForecastDay } from "./i-weather-forecast-day";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
     templateUrl: './weather-forecast-widget.component.html',
     styleUrls: ['./weather-forecast-widget.component.css'],
 })
 
-export class WeatherForecastWidget implements OnInit, OnDestroy {
+export class WeatherForecastWidget implements OnInit, OnDestroy, AfterViewInit, DoCheck  {
 
     @Input() config: IWidgetConfig;
 
     private forecastRefreshTimerId: number;
     public weatherForecastDaysArray: IWeatherForecastDay[] = [];
 
+    private cdkDropListContainer;
+    private cdkDropListContainerHeight = 150;
+    private weatherDataContainerHeight = 150;
+    private weatherDataContainerMarginTop = 0;
+    public weatherDataContainerStyle = new BehaviorSubject<{height: string, 'margin-top': string}>({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px'});
+    private weatherTemperatureContainerHeight = 150;
+    private weatherTemperatureContainerMarginTop = 70;
+    public weatherTemperatureContainerStyle = new BehaviorSubject<{height: string, 'margin-top': string}>({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px'});
+
     constructor(
         private http: HttpClient,
         private realtime: Realtime,
-        private invSvc: InventoryService) {
+        private invSvc: InventoryService,
+        private elRef: ElementRef) {
     }
 
     ngOnInit() {
+        if (this.config.refreshPeriod === undefined) {
+            this.config.refreshPeriod = 1;
+        }
         if (this.config.refreshPeriod <= 0) {
             this.config.refreshPeriod = 1;
         }
         if (this.config.refreshPeriod > 24) {
             this.config.refreshPeriod = 24;
+        }
+        if (this.config.days === undefined) {
+            this.config.days = 5;
         }
         if (this.config.days <= 0) {
             this.config.days = 1;
@@ -53,7 +70,6 @@ export class WeatherForecastWidget implements OnInit, OnDestroy {
         if (this.config.days > 5) {
             this.config.days = 5;
         }
-
         this.updateForDeviceChange().then();
     }
 
@@ -72,8 +88,7 @@ export class WeatherForecastWidget implements OnInit, OnDestroy {
 
     private async updateForecast() {
         try {
-            const getForecastResponse = await this.getForecast();
-            console.log(getForecastResponse);
+            const getForecastResponse = await this.getForecast().toPromise();
             if (getForecastResponse == undefined || !_.has(getForecastResponse, `list`)) {
                 return;
             }
@@ -98,23 +113,17 @@ export class WeatherForecastWidget implements OnInit, OnDestroy {
                     };
             });
         } catch(error) {
-            console.error(error);
+            console.error(error.error.message);
         }
     }
 
     private getForecast() {
         if ( _.has(this.config, 'city') ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.config.city}&units=metric&appid=${this.config.apikey}`).toPromise()
-                .catch(error => {
-                    throw new Error(`Error retrieving weather forecast by city '${this.config.city}' : ${JSON.stringify(error)}`);
-            })
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.config.city}&units=metric&appid=${this.config.apikey}`)
         } else if( this.config.latitude && this.config.longitude ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.config.latitude}&lon=${this.config.longitude}&units=metric&appid=${this.config.apikey}`).toPromise()
-                .catch(error => {
-                    throw new Error(`Error retrieving weather forecast by latitude '${this.config.latitude}' and longitude '${this.config.longitude}' : ${JSON.stringify(error)}`);
-            });
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.config.latitude}&lon=${this.config.longitude}&units=metric&appid=${this.config.apikey}`)
         } else {
-            throw new Error(`Weather Forecast widget location (city or latitude and longitude) has not been set correctly.`);
+            console.log("Weather Widget configuration was not set correctly.")
         }
     }
 
@@ -149,4 +158,43 @@ export class WeatherForecastWidget implements OnInit, OnDestroy {
             });
         });
     }
+
+    public ngAfterViewInit() {
+        this.cdkDropListContainer = this.elRef.nativeElement.parentNode.parentNode.parentNode.parentNode;
+        // Check to see if the widget title is visible
+        const c8yDashboardChildTitle = this.cdkDropListContainer.querySelector('c8y-dashboard-child-title');
+        const widgetTitleDisplayValue: string = window.getComputedStyle(c8yDashboardChildTitle).getPropertyValue('display');
+        if(widgetTitleDisplayValue !== undefined && widgetTitleDisplayValue !== null && widgetTitleDisplayValue === 'none') {
+            this.weatherDataContainerMarginTop = 20;
+            this.weatherTemperatureContainerMarginTop = 105;
+            this.weatherDataContainerStyle.next({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px'});
+            this.weatherTemperatureContainerStyle.next({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px'});
+        } else {
+            this.weatherDataContainerMarginTop = 0;
+            this.weatherTemperatureContainerMarginTop = 70;
+            this.weatherDataContainerStyle.next({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px'});
+            this.weatherTemperatureContainerStyle.next({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px'});
+        }
+    }
+
+    public ngDoCheck() {
+        if (this.cdkDropListContainer) {
+            this.cdkDropListContainerHeight = this.cdkDropListContainer.offsetHeight;
+            this.weatherDataContainerHeight = this.cdkDropListContainerHeight / 1.545;
+            if (this.weatherDataContainerHeight + 'px' != this.weatherDataContainerStyle.getValue().height) {
+                this.weatherDataContainerStyle.next({
+                    height: this.weatherDataContainerHeight + 'px',
+                    'margin-top': this.weatherDataContainerMarginTop + 'px'
+                });
+            }
+            if (this.weatherTemperatureContainerHeight + 'px' != this.weatherTemperatureContainerStyle.getValue().height) {
+                this.weatherTemperatureContainerStyle.next({
+                    height: this.weatherTemperatureContainerHeight + 'px',
+                    'margin-top': this.weatherTemperatureContainerMarginTop + 'px'
+                });
+            }
+        }
+    }
+
+
 }
