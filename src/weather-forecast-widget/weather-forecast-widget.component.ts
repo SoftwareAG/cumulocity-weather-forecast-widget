@@ -15,113 +15,122 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
  */
-import { Component, Input, OnDestroy } from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import { Realtime, InventoryService } from '@c8y/client';
 import * as _ from 'lodash';
 import { HttpClient } from "@angular/common/http";
+import { IWidgetConfig } from "./i-widget-config";
+import { IWeatherForecastDay } from "./i-weather-forecast-day";
 
 @Component({
     templateUrl: './weather-forecast-widget.component.html',
     styleUrls: ['./weather-forecast-widget.component.css'],
 })
 
-export class WeatherForecastWidget implements OnDestroy {
+export class WeatherForecastWidget implements OnInit, OnDestroy {
 
-    widgetConfiguration: any;
-    weather_forecast: any = <any>[];
-    forecastRefreshTimer: any;
+    @Input() config: IWidgetConfig;
 
-    @Input() set config(newConfig: any) {
-        this.widgetConfiguration = newConfig;
-        if( !_.has(this.widgetConfiguration, `weatherAPIConfig.period`)
-        ||  this.widgetConfiguration.weatherAPIConfig.period <= 0 ) {
-            this.widgetConfiguration.weatherAPIConfig.period = 12;
-        }
-        this.updateForDeviceChange( this.widgetConfiguration );
-    }
+    private forecastRefreshTimerId: number;
+    public weatherForecastDaysArray: IWeatherForecastDay[] = [];
 
     constructor(
         private http: HttpClient,
         private realtime: Realtime,
-        private invSvc: InventoryService) { }
-
-    ngOnDestroy(): void {
-        clearInterval(this.forecastRefreshTimer);
+        private invSvc: InventoryService) {
     }
 
-    private updateForDeviceChange(config) {
-        // Get the weather forecast data, and filter/transform it
-        (async () => {
-            await this.getDeviceLocation( _.get(this.widgetConfiguration, 'device.id') );
+    ngOnInit() {
+        if (this.config.refreshPeriod <= 0) {
+            this.config.refreshPeriod = 1;
+        }
+        if (this.config.refreshPeriod > 24) {
+            this.config.refreshPeriod = 24;
+        }
+        if (this.config.days <= 0) {
+            this.config.days = 1;
+        }
+        if (this.config.days > 5) {
+            this.config.days = 5;
+        }
+
+        this.updateForDeviceChange().then();
+    }
+
+    ngOnDestroy(): void {
+        clearInterval(this.forecastRefreshTimerId);
+    }
+
+    private async updateForDeviceChange() {
+        // Get the weather forecast data and filter/transform it
+        await this.getDeviceLocation();
+        await this.updateForecast();
+        this.forecastRefreshTimerId = <any>setInterval( async () => {
             await this.updateForecast();
-            this.forecastRefreshTimer = setInterval( async () => {
-                await this.updateForecast();
-            }, this.widgetConfiguration.weatherAPIConfig.period*60*60*1000);
-        })();
+        }, this.config.refreshPeriod * 60 * 60 * 1000);
     }
 
     private async updateForecast() {
-        const parent = this;
-
         try {
-            const getForecastResponse = await this.getForecast(this.widgetConfiguration).toPromise();
+            const getForecastResponse = await this.getForecast().toPromise();
             if (getForecastResponse == undefined || !_.has(getForecastResponse, `list`)) {
                 return;
             }
 
-            parent.weather_forecast = [];
             let allWeather = _.get(getForecastResponse, `list`)
-            allWeather.forEach(function (item) {
-                if ((item.dt_txt !== undefined)
-                    && (item.dt_txt.includes('12:00:00'))) {
 
-                    let currVal = <any>{};
-                    currVal.date = item.dt_txt.substring(0, 10)
-                    currVal.temp = item.main.temp;
-                    currVal.min_temp = item.main.temp_min;
-                    currVal.max_temp = item.main.temp_max;
-                    currVal.pressure = item.main.pressure;
-                    currVal.humidity = item.main.humidity;
-                    currVal.wind = item.wind;
-                    currVal.overview = item.weather[0].main;
-                    currVal.desc = item.weather[0].description;
-                    currVal.icon = item.weather[0].icon;
-
-                    parent.weather_forecast.push(currVal);
-                }
+            this.weatherForecastDaysArray = allWeather
+                .filter( weatherForecastDay => weatherForecastDay.dt_txt !== undefined && (weatherForecastDay.dt_txt.includes('12:00:00')) )
+                .slice( 0, this.config.days )
+                .map( weatherForecastDay => {
+                    return {
+                        date: weatherForecastDay.dt_txt.substring(0, 10),
+                        temp: weatherForecastDay.main.temp,
+                        min_temp: weatherForecastDay.main.temp_min,
+                        max_temp: weatherForecastDay.main.temp_max,
+                        pressure: weatherForecastDay.main.pressure,
+                        humidity: weatherForecastDay.main.humidity,
+                        wind: weatherForecastDay.wind,
+                        overview: weatherForecastDay.weather[0].main,
+                        desc: weatherForecastDay.weather[0].description,
+                        icon: weatherForecastDay.weather[0].icon
+                    };
             });
         } catch(error) {
-            console.error(error);
+            console.error(error.error.message);
         }
     }
 
-    private getForecast(loc: string) {
-        if ( this.widgetConfiguration.weatherAPIConfig.city ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.widgetConfiguration.weatherAPIConfig.city}&units=metric&appid=${this.widgetConfiguration.weatherAPIConfig.apikey}`)
-        } else if( this.widgetConfiguration.weatherAPIConfig.latitude && this.widgetConfiguration.weatherAPIConfig.longitude ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.widgetConfiguration.weatherAPIConfig.latitude}&lon=${this.widgetConfiguration.weatherAPIConfig.longitude}&units=metric&appid=${this.widgetConfiguration.weatherAPIConfig.apikey}`)
+    private getForecast() {
+        if ( _.has(this.config, 'city') ) {
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.config.city}&units=metric&appid=${this.config.apikey}`)
+        } else if( this.config.latitude && this.config.longitude ) {
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.config.latitude}&lon=${this.config.longitude}&units=metric&appid=${this.config.apikey}`)
         } else {
             console.log("Weather Widget configuration was not set correctly.")
         }
     }
 
-    private async getDeviceLocation(deviceId: String) {
-        if( deviceId ) {
-            const mo = await this.getTargetObject(deviceId);
-            if (mo && mo.c8y_Position) {
+    private async getDeviceLocation() {
+        if ( _.has(this.config, 'device.id')) {
+            const mo = await this.getTargetObject(this.config.device.id);
+            if ( mo && mo.c8y_Position ) {
                 // console.log("Position:" + mo.c8y_Position);
-                this.widgetConfiguration.weatherAPIConfig.latitude = mo.c8y_Position.lat;
-                this.widgetConfiguration.weatherAPIConfig.longitude = mo.c8y_Position.lng;
-            } else if (this.widgetConfiguration.weatherAPIConfig.city === undefined ||
-                        this.widgetConfiguration.weatherAPIConfig.city === '') {
+                this.config.latitude = mo.c8y_Position.lat;
+                this.config.longitude = mo.c8y_Position.lng;
+            } else {
                 // if the device doesn't have a location, default to London
-                console.log(`The device selected for the Weather widget does not have a location, defaulting weather widget to 'London'`);
-                this.widgetConfiguration.weatherAPIConfig.city = 'London';
+                console.error(`The device selected for the Weather widget does not have a location, defaulting weather widget to 'London'`);
+                this.config.city = 'London';
             }
+        } else if ( this.config.city === undefined || this.config.city === '') {
+            // if the device and city haven't been set, default to London
+            console.error(`A device has not been selected and a city name has not been entered, the weather forecast widget default location has been set to 'London'`);
+            this.config.city = 'London';
         }
     }
 
-    private getTargetObject(deviceId: String): Promise<any> {
+    private getTargetObject(deviceId: string): Promise<any> {
         return new Promise( (resolve, reject) => {
             this.invSvc.detail(deviceId)
                 .then( (resp) => {

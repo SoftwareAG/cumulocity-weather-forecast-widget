@@ -15,25 +15,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
  */
-import { Component, Input } from "@angular/core";
-import { ControlContainer, NgForm } from "@angular/forms";
-import { IWidgetConfig } from "./i-widget-config";
+export interface IWidgetConfig {
+    apikey: string,
+    days: number
+    refreshPeriod: number,
+    city: string,
 
-@Component({
-    selector: 'weather-forecast-widget-config-component',
-    templateUrl: './weather-forecast-widget.config.component.html',
-    viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
-})
-
-export class WeatherForecastWidgetConfig {
-
-    @Input() config: IWidgetConfig = {
-        apikey: '',
-        latitude: '',
-        longitude: '',
-        city: '',
-        refreshPeriod: 1,
-        days: 5
+    device?: {
+        id: string;
+        name: string;
     };
 
+    latitude?: string,
+    longitude?: string,
 }

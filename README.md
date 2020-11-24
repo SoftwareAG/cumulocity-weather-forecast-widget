@@ -33,6 +33,7 @@ NOTE: This guide assumes that you have followed the [installation](https://githu
 
 1. Select your device in the `Target Assets or Devices` field
 2. Enter the `API Key` which was generated in your openweathermap `API keys` page
+3. Enter the number of weather forecast days in the `Days` field (between 1 and 5 days) e.g. 5
 3. Enter the `Refresh (in hours)` e.g. 1 
 4. Enter the `City`. This is an optional field. The latitude and longitude of your selected device will be used if it has been configured.
 

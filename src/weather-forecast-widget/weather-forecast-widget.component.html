@@ -1,40 +1,40 @@
-<ng-container *ngIf="weather_forecast">
+<ng-container *ngIf="weatherForecastDaysArray.length > 0">
     <div class="weather-forecast-container">
-        <div class="weather-group" *ngFor="let weather of weather_forecast">
+        <div class="weather-group" *ngFor="let weatherForecastDay of weatherForecastDaysArray">
             <table>
                 <tr>
                     <td class="weather-image-container" colspan="2">
-                        <img src="http://openweathermap.org/img/wn/{{weather.icon}}@2x.png"/>
+                        <img src="http://openweathermap.org/img/wn/{{weatherForecastDay.icon}}@2x.png" alt="Weather forecast day icon"/>
                     </td>
                 </tr>
                 <tr>
                     <td class="weather-date-container" colspan="2">
-                        <b>{{weather.date| date:'EEE dd-MMM'}}</b>
+                        <b>{{weatherForecastDay.date| date:'EEE dd-MMM'}}</b>
                     </td>
                 </tr>
                 <tr>
                     <td class="weather-attribute-title">
                         <b>Outlook:</b>
                     </td>
-                    <td>{{weather.desc}} </td>
+                    <td>{{weatherForecastDay.desc}} </td>
                 </tr>
                 <tr>
                     <td class="weather-attribute-title">
                         <b>Temperature:</b>
                     </td>
-                    <td>{{weather.temp | number:"1.0-0"}}C</td>
+                    <td>{{weatherForecastDay.temp | number:"1.0-0"}}C</td>
                 </tr>
                 <tr>
                     <td class="weather-attribute-title">
                         <b>Humidity:</b>
                     </td>
-                    <td>{{weather.humidity}}%</td>
+                    <td>{{weatherForecastDay.humidity}}%</td>
                 </tr>
                 <tr>
                     <td class="weather-attribute-title">
                         <b>Wind:</b>
                     </td>
-                    <td>{{weather.wind.speed | number:"1.0-0"}}mph</td>
+                    <td>{{weatherForecastDay.wind.speed | number:"1.0-0"}}mph</td>
                 </tr>
             </table>
         </div>

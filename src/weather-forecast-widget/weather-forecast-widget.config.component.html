@@ -1,9 +1,7 @@
-<ng-form #configForm="ngForm">
+<ng-form>
 
     <c8y-form-group>
-        <label for="weatherAPIConfig">
-            OpenWeatherAPI Configuration
-        </label>
+          OpenWeatherAPI Configuration
     </c8y-form-group>
 
     <c8y-form-group>
@@ -11,17 +9,25 @@
             API Key
         </label>
         <input type="text" name="weatherAPIConfig-apikey" id="openWeather-apikey"
-            class="form-control bar-chart-control" (change)="onConfigChanged($event)"
-            [(ngModel)]="weatherAPIConfig.apikey" placeholder='API Key' />
+            class="form-control bar-chart-control"
+            [(ngModel)]="config.apikey" placeholder='Enter your OpenWeather API Key' />
+    </c8y-form-group>
+
+    <c8y-form-group>
+        <label for="openWeather-days">
+            Days
+        </label>
+        <input type="number" min="1" max="5" name="weatherAPIConfig-days" id="openWeather-days" class="form-control"
+            [(ngModel)]="config.days" placeholder="Enter the number of forecast days" />
     </c8y-form-group>
 
     <c8y-form-group>
         <label for="openWeather-period">
             Refresh (in hours)
         </label>
-        <input type="text" name="weatherAPIConfig-period" id="openWeather-period"
-            class="form-control bar-chart-control" (change)="onConfigChanged($event)"
-            [(ngModel)]="weatherAPIConfig.period" placeholder='Update Period (hours)' />
+        <input type="number" min="1" max="24" name="weatherAPIConfig-period" id="openWeather-period"
+            class="form-control bar-chart-control"
+            [(ngModel)]="config.refreshPeriod" placeholder='Update period (hours)' />
     </c8y-form-group>
 
     <c8y-form-group>
@@ -29,7 +35,7 @@
             City
         </label>
         <input type="text" name="weatherAPIConfig-city" id="openWeather-city"
-                class="form-control bar-chart-control" (change)="onConfigChanged($event)"
-                [(ngModel)]="weatherAPIConfig.city" placeholder='City (blank=<device location>)' />
+            class="form-control bar-chart-control"
+            [(ngModel)]="config.city" placeholder='City (blank=<device location>)' />
     </c8y-form-group>
 </ng-form>
