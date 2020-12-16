@@ -1,4 +1,4 @@
-﻿# Cumulocity IoT Weather forecast widget[<img width="35" src="https://user-images.githubusercontent.com/67993842/97668428-f360cc80-1aa7-11eb-8801-da578bda4334.png"/>](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.0/weather-forecast-widget.zip)
+﻿# Cumulocity IoT Weather forecast widget[<img width="35" src="https://user-images.githubusercontent.com/67993842/97668428-f360cc80-1aa7-11eb-8801-da578bda4334.png"/>](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.1/weather-forecast-widget_v1.0.1.zip)
 
 
 ![Weather Forecast widget](weather-forecast-widget.png)
@@ -13,7 +13,7 @@
 
 ### Runtime Widget Deployment?
 
-* This widget supports runtime deployment. Download the [Runtime Binary](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.0/weather-forecast-widget.zip) and follow runtime deployment instructions from [here](https://github.com/SoftwareAG/cumulocity-runtime-widget-loader).
+* This widget supports runtime deployment. Download the [Runtime Binary](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.1/weather-forecast-widget_v1.0.1.zip) and follow runtime deployment instructions from [here](https://github.com/SoftwareAG/cumulocity-runtime-widget-loader).
 
 ## Quickstart
 This guide will teach you how to add the widget in your existing or new dashboard.
