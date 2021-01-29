@@ -57,7 +57,9 @@
                     </div>
                     <div class="col col-lg-2">
                         <div class="weather-temperature-container" [ngStyle]="(weatherTemperatureContainerStyle | async)">
-                            {{weatherForecastDay.temp | number:"1.0-0"}}C
+                            <div class="weather-temperature">
+                                {{weatherForecastDay.temp | number:"1.0-0"}}C
+                            </div>
                         </div>
                     </div>
                     <div class="col col-lg-6">

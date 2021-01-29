@@ -37,12 +37,15 @@ export class WeatherForecastWidget implements OnInit, OnDestroy, AfterViewInit, 
 
     private cdkDropListContainer;
     private cdkDropListContainerHeight = 150;
+    private cdkDropListContainerWidth = 200;
     private weatherDataContainerHeight = 150;
     private weatherDataContainerMarginTop = 0;
-    public weatherDataContainerStyle = new BehaviorSubject<{height: string, 'margin-top': string}>({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px'});
+    private weatherDataContainerFontSize = 14;
+    public weatherDataContainerStyle = new BehaviorSubject<{height: string, 'margin-top': string, 'font-size': string}>({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px', 'font-size': this.weatherDataContainerFontSize + 'px'});
     private weatherTemperatureContainerHeight = 150;
-    private weatherTemperatureContainerMarginTop = 70;
-    public weatherTemperatureContainerStyle = new BehaviorSubject<{height: string, 'margin-top': string}>({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px'});
+    private weatherTemperatureContainerMarginTop = 0;
+    private weatherTemperatureContainerFontSize = 25;
+    public weatherTemperatureContainerStyle = new BehaviorSubject<{height: string, 'margin-top': string, 'font-size': string}>({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px', 'font-size': this.weatherTemperatureContainerFontSize + 'px'});
 
     constructor(
         private http: HttpClient,
@@ -88,7 +91,7 @@ export class WeatherForecastWidget implements OnInit, OnDestroy, AfterViewInit, 
 
     private async updateForecast() {
         try {
-            const getForecastResponse = await this.getForecast().toPromise();
+            const getForecastResponse = await this.getForecast();
             if (getForecastResponse == undefined || !_.has(getForecastResponse, `list`)) {
                 return;
             }
@@ -113,17 +116,23 @@ export class WeatherForecastWidget implements OnInit, OnDestroy, AfterViewInit, 
                     };
             });
         } catch(error) {
-            console.error(error.error.message);
+            console.error(error);
         }
     }
 
     private getForecast() {
         if ( _.has(this.config, 'city') ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.config.city}&units=metric&appid=${this.config.apikey}`)
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?q=${this.config.city}&units=metric&appid=${this.config.apikey}`).toPromise()
+                .catch(error => {
+                    throw new Error(`Error retrieving weather forecast by city '${this.config.city}' : ${JSON.stringify(error)}`);
+            })
         } else if( this.config.latitude && this.config.longitude ) {
-            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.config.latitude}&lon=${this.config.longitude}&units=metric&appid=${this.config.apikey}`)
+            return this.http.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.config.latitude}&lon=${this.config.longitude}&units=metric&appid=${this.config.apikey}`).toPromise()
+                .catch(error => {
+                    throw new Error(`Error retrieving weather forecast by latitude '${this.config.latitude}' and longitude '${this.config.longitude}' : ${JSON.stringify(error)}`);
+            });
         } else {
-            console.log("Weather Widget configuration was not set correctly.")
+            throw new Error(`Weather Forecast widget location (city or latitude and longitude) has not been set correctly.`);
         }
     }
 
@@ -161,40 +170,90 @@ export class WeatherForecastWidget implements OnInit, OnDestroy, AfterViewInit, 
 
     public ngAfterViewInit() {
         this.cdkDropListContainer = this.elRef.nativeElement.parentNode.parentNode.parentNode.parentNode;
+
+        this.cdkDropListContainerHeight = this.cdkDropListContainer.offsetHeight;
+        this.cdkDropListContainerWidth = this.cdkDropListContainer.offsetWidth;
+
         // Check to see if the widget title is visible
         const c8yDashboardChildTitle = this.cdkDropListContainer.querySelector('c8y-dashboard-child-title');
         const widgetTitleDisplayValue: string = window.getComputedStyle(c8yDashboardChildTitle).getPropertyValue('display');
         if(widgetTitleDisplayValue !== undefined && widgetTitleDisplayValue !== null && widgetTitleDisplayValue === 'none') {
             this.weatherDataContainerMarginTop = 20;
-            this.weatherTemperatureContainerMarginTop = 105;
-            this.weatherDataContainerStyle.next({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px'});
-            this.weatherTemperatureContainerStyle.next({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px'});
+            if (this.cdkDropListContainerHeight < 216) {
+                this.weatherTemperatureContainerMarginTop = 20;
+            } else {
+                this.weatherTemperatureContainerMarginTop = 105;
+            }
+
+            this.weatherDataContainerStyle.next({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px', 'font-size': this.weatherDataContainerFontSize + 'px'});
+            this.weatherTemperatureContainerStyle.next({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px', 'font-size': this.weatherTemperatureContainerFontSize + 'px'});
         } else {
             this.weatherDataContainerMarginTop = 0;
-            this.weatherTemperatureContainerMarginTop = 70;
-            this.weatherDataContainerStyle.next({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px'});
-            this.weatherTemperatureContainerStyle.next({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px'});
+            this.weatherTemperatureContainerMarginTop = 0;
+            this.weatherDataContainerStyle.next({height: this.weatherDataContainerHeight + 'px', 'margin-top': this.weatherDataContainerMarginTop + 'px', 'font-size': this.weatherDataContainerFontSize + 'px'});
+            this.weatherTemperatureContainerStyle.next({height: this.weatherTemperatureContainerHeight + 'px', 'margin-top': this.weatherTemperatureContainerMarginTop + 'px', 'font-size': this.weatherTemperatureContainerFontSize + 'px'});
         }
     }
 
     public ngDoCheck() {
         if (this.cdkDropListContainer) {
             this.cdkDropListContainerHeight = this.cdkDropListContainer.offsetHeight;
+            this.cdkDropListContainerWidth = this.cdkDropListContainer.offsetWidth;
+
             this.weatherDataContainerHeight = this.cdkDropListContainerHeight / 1.545;
+            this.weatherTemperatureContainerHeight = this.cdkDropListContainerHeight / 1.545;
+
             if (this.weatherDataContainerHeight + 'px' != this.weatherDataContainerStyle.getValue().height) {
                 this.weatherDataContainerStyle.next({
                     height: this.weatherDataContainerHeight + 'px',
-                    'margin-top': this.weatherDataContainerMarginTop + 'px'
+                    'margin-top': this.weatherDataContainerMarginTop + 'px',
+                    'font-size': this.weatherTemperatureContainerFontSize + 'px'
                 });
             }
             if (this.weatherTemperatureContainerHeight + 'px' != this.weatherTemperatureContainerStyle.getValue().height) {
+                if (this.cdkDropListContainerHeight < 216) {
+                    this.weatherTemperatureContainerFontSize = 15;
+                } else {
+                    this.weatherTemperatureContainerFontSize = 25;
+                }
+
                 this.weatherTemperatureContainerStyle.next({
                     height: this.weatherTemperatureContainerHeight + 'px',
-                    'margin-top': this.weatherTemperatureContainerMarginTop + 'px'
+                    'margin-top': this.weatherTemperatureContainerMarginTop + 'px',
+                    'font-size': this.weatherTemperatureContainerFontSize + 'px'
+                });
+            }
+
+            if (this.cdkDropListContainerHeight < 216 || this.cdkDropListContainerWidth <= 249) {
+                this.weatherTemperatureContainerHeight = 50;
+                this.weatherDataContainerHeight = 55;
+
+                this.weatherDataContainerFontSize = 10;
+                this.weatherTemperatureContainerFontSize = 15;
+                this.weatherTemperatureContainerStyle.next({
+                    height: this.weatherTemperatureContainerHeight + 'px',
+                    'margin-top': this.weatherTemperatureContainerMarginTop + 'px',
+                    'font-size': this.weatherTemperatureContainerFontSize + 'px',
+                });
+                this.weatherDataContainerStyle.next({
+                    height: this.weatherDataContainerHeight + 'px',
+                    'margin-top': this.weatherDataContainerMarginTop + 'px',
+                    'font-size': this.weatherDataContainerFontSize + 'px',
+                });
+            } else {
+                this.weatherDataContainerFontSize = 14;
+                this.weatherTemperatureContainerFontSize = 25;
+                this.weatherTemperatureContainerStyle.next({
+                    height: this.weatherTemperatureContainerHeight + 'px',
+                    'margin-top': this.weatherTemperatureContainerMarginTop + 'px',
+                    'font-size': this.weatherTemperatureContainerFontSize + 'px',
+                });
+                this.weatherDataContainerStyle.next({
+                    height: this.weatherDataContainerHeight + 'px',
+                    'margin-top': this.weatherDataContainerMarginTop + 'px',
+                    'font-size': this.weatherDataContainerFontSize + 'px',
                 });
             }
         }
     }
-
-
 }
