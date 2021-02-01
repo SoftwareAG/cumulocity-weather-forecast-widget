@@ -51,7 +51,7 @@
                 </div>
                 <div class="row">
                     <div class="col col-lg-4">
-                        <div class="weather-image-container">
+                        <div class="weather-image-container" [ngStyle]="(weatherImageContainerStyle | async)">
                             <img src="https://openweathermap.org/img/wn/{{weatherForecastDay.icon}}@4x.png" alt="Weather forecast day icon"/>
                         </div>
                     </div>
