@@ -13,12 +13,10 @@
 
 ### Runtime Widget Deployment?
 
-* This widget supports runtime deployment. Download the [Runtime Binary](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.1/weather-forecast-widget_v1.0.1.zip) and follow runtime deployment instructions from [here](https://github.com/SoftwareAG/cumulocity-runtime-widget-loader).
+* This widget supports runtime deployment. Download the [Runtime Binary](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.1/weather-forecast-widget_v1.0.1.zip) and use Application Builder to install your runtime widget.
 
 ## Quickstart
 This guide will teach you how to add the widget in your existing or new dashboard.
-
-NOTE: This guide assumes that you have followed the [installation](https://github.com/SoftwareAG/cumulocity-runtime-widget-loader) instructions
 
 1. Register a new account with [OpenWeather](https://openweathermap.org/)
 2. Verify your openweathermap account by clicking on the email which has been sent to you
