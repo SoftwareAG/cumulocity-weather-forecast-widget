@@ -1,5 +1,6 @@
 ﻿# Cumulocity IoT Weather forecast widget[<img width="35" src="https://user-images.githubusercontent.com/67993842/97668428-f360cc80-1aa7-11eb-8801-da578bda4334.png"/>](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget/releases/download/1.0.1/weather-forecast-widget_v1.0.1.zip)
 
+Displays a 5-day weather forecast using weather data provided by the OpenWeatherAPI. 
 
 ![Weather Forecast widget](weather-forecast-widget.png)
 
