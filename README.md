@@ -2,7 +2,9 @@
 
 Displays a 5-day weather forecast using weather data provided by the OpenWeatherAPI. 
 
-![Weather Forecast widget](weather-forecast-widget.png)
+
+![Weather_Forecast](https://user-images.githubusercontent.com/99970126/180731134-c2a8a53b-317e-4a58-a8a1-f067a9801971.png)
+
 
 ## Features
 **Realtime:** Realtime weather updates from the OpenWeatherAPI
