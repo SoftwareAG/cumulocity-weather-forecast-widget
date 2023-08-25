@@ -5,7 +5,7 @@ Displays a 5-day weather forecast using weather data provided by the OpenWeather
 
 ![Weather_Forecast](https://user-images.githubusercontent.com/99970126/180731134-c2a8a53b-317e-4a58-a8a1-f067a9801971.png)
 
-
+> ### ⚠️ This project is no longer under development. Please use [Weather Forecast Widget for Cumulocity](https://github.com/SoftwareAG/cumulocity-weather-forecast-widget-plugin) for Application Builder >=2.x.x and Cumulocity >=1016.x.x⚠️
 ## Features
 **Realtime:** Realtime weather updates from the OpenWeatherAPI
 
